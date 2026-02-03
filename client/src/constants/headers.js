@@ -1,4 +1,4 @@
-const RIVER_HEADERS_TABLE = ['Navn', 'Dato', 'Projektnummer']
+const RIVER_HEADERS_TABLE = ['Navn', 'Dato', 'Prosjekt', 'Projektnummer']
 const STATION_HEADERS_TABLE = ['Navn', 'Dato', 'Kl.']
 
 const STATION_SUMMARY_HEADERS_TABLE = ['Stasjon', 'Elvtype', 'Vær', 'Min fisket', 'Ant fisk', 'Fisk/min']

@@ -1,6 +1,6 @@
 <script>
     import { onMount, onDestroy, createEventDispatcher } from 'svelte'
-    import { redIcon, orangeIcon, blueIcon } from '../constants/leafletIcons.js'
+    import { redCircle, blueCircle, orangeCircle } from '../constants/leafletIcons.js'
     import { mapLayers } from '../constants/leafletLayers.js'
     import leaflet from 'leaflet'
 
@@ -158,13 +158,13 @@
       const startPos = [station.startPos.coordinates[1], station.startPos.coordinates[0]]
       const endPos = [station.endPos.coordinates[1], station.endPos.coordinates[0]]
 
-      // creates a marker for the start position of the station
-      const startMarker = leaflet.marker(startPos, { icon: redIcon })
+      // creates a circle marker for the start position of the station
+      const startMarker = leaflet.circleMarker(startPos, redCircle)
         .addTo(stationLayerGroup)
         .on('click', () => dispatch('stationClicked', { id: station.id }))
 
-      // creates a marker for the end position of the station
-      const endMarker = leaflet.marker(endPos, { icon: redIcon })
+      // creates a circle marker for the end position of the station
+      const endMarker = leaflet.circleMarker(endPos, redCircle)
         .addTo(stationLayerGroup)
         .on('click', () => dispatch('stationClicked', { id: station.id }))
 
@@ -184,7 +184,7 @@
     }
 
     /**
-     * Selects the station by changing the colors of the markers and zooming in on the station
+     * Selects the station by changing the colors of the markers
      * Deselects the previous selected station
      * @param {object} station - The station to select
      */
@@ -196,12 +196,9 @@
       const marker = stationMarkers.get(station.id)
 
       // Set the selected station to orange
-      marker.startMarker.setIcon(orangeIcon)
-      marker.endMarker.setIcon(orangeIcon)
+      marker.startMarker.setStyle(orangeCircle)
+      marker.endMarker.setStyle(orangeCircle)
       marker.line.setStyle({ color: 'orange' })
-
-      // Pan to the selected station and zoom in
-      map.flyTo(marker.startMarker.getLatLng(), 13, { duration: 0.5 })
 
       // Save the selected station as the previous selected station
       previousSelectedStation = station
@@ -226,8 +223,8 @@
       }
 
       // Revert the colors of the markers
-      oldSelectedMarker.startMarker.setIcon(redIcon)
-      oldSelectedMarker.endMarker.setIcon(redIcon)
+      oldSelectedMarker.startMarker.setStyle(redCircle)
+      oldSelectedMarker.endMarker.setStyle(redCircle)
       oldSelectedMarker.line.setStyle({ color: 'red' })
     }
 
@@ -242,10 +239,10 @@
           return
         }
 
-        // Create a marker for the river
-        const marker = leaflet.marker(
+        // Create a circle marker for the river
+        const marker = leaflet.circleMarker(
           [river.position.coordinates[1], river.position.coordinates[0]],
-          { icon: blueIcon })
+          blueCircle)
           .addTo(riverLayerGroup)
           .on('click', () => dispatch('riverClicked', { id: river.id }))
 
@@ -263,7 +260,7 @@
     }
 
     /**
-     * Selects the river by changing the color of the marker and zooming in on the river
+     * Selects the river by changing the color of the marker
      * Deselects the previous selected river
      * @param {object} river - The river to select
      */
@@ -275,10 +272,7 @@
       const marker = riverMarkers.get(river.id)
 
       // Set the selected river to orange
-      marker.setIcon(orangeIcon)
-
-      // Pan to the selected station and zoom in
-      map.flyTo(marker.getLatLng(), 11, { duration: 0.5 })
+      marker.setStyle(orangeCircle)
 
       // Save the selected river as the previous selected river
       previousSelectedRiver = river
@@ -303,7 +297,7 @@
       }
 
       // Revert the color of the marker
-      oldSelectedMarker.setIcon(blueIcon)
+      oldSelectedMarker.setStyle(blueCircle)
     }
 </script>
 

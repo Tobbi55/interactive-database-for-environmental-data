@@ -15,6 +15,20 @@ import { addFeedbackToStore } from '../utils/addFeedbackToStore.js'
 import { FEEDBACK_TYPES, FEEDBACK_CODES, FEEDBACK_MESSAGES } from '../constants/feedbackMessages'
 import { authRefresh } from './auth.js'
 import { reportError } from '../utils/report.js'
+import {
+  riverWithSpeciesJson,
+  riverSummaryJson,
+  stationDownloadJson,
+  stationSummaryJson,
+  stationWithSpeciesJson,
+  hunderfossenRiverJson,
+  hunderfossenRiverSummaryJson,
+  hunderfossenStationsJson,
+  hunderfossenStationSummariesJson
+} from '../test-data/postgrestTestData.js'
+
+// Check if running in dev mode without API URL
+const DEV_MODE = !POSTGREST_URL || POSTGREST_URL === 'undefined'
 
 /**
  * Fetches data from the PostgREST API on the endpoint specified
@@ -76,6 +90,10 @@ async function handleResponse (response) {
  * @async
  */
 export async function fetchRivers () {
+  if (DEV_MODE) {
+    console.log('🔧 DEV MODE: Using test-data with Gaula + Hunderfossen')
+    return Promise.resolve([riverWithSpeciesJson, hunderfossenRiverJson])
+  }
   return fetchFromPostgrest(RIVERS_ENDPOINT)
 }
 
@@ -85,6 +103,10 @@ export async function fetchRivers () {
  * @async
  */
 export async function fetchStations () {
+  if (DEV_MODE) {
+    console.log('🔧 DEV MODE: Using test-data with Gaula + Hunderfossen stations')
+    return Promise.resolve([stationWithSpeciesJson, ...hunderfossenStationsJson])
+  }
   return fetchFromPostgrest(STATIONS_ENDPOINT)
 }
 
@@ -95,6 +117,13 @@ export async function fetchStations () {
  * @async
  */
 export async function fetchRiverSummary (id) {
+  if (DEV_MODE) {
+    console.log('🔧 DEV MODE: Using test-data river summaries')
+    const results = []
+    if (id === riverSummaryJson.id) results.push(riverSummaryJson)
+    if (id === hunderfossenRiverSummaryJson.id) results.push(hunderfossenRiverSummaryJson)
+    return Promise.resolve(results)
+  }
   const endpoint = `${RIVER_SUMMARY_ENDPOINT}?id=eq.${id}`
   return fetchFromPostgrest(endpoint)
 }
@@ -106,6 +135,16 @@ export async function fetchRiverSummary (id) {
  * @async
  */
 export async function fetchStationSummary (id) {
+  if (DEV_MODE) {
+    console.log('🔧 DEV MODE: Using test-data station summaries')
+    const ids = Array.isArray(id) ? id : [id]
+    const results = []
+    if (ids.includes(stationSummaryJson.id)) results.push(stationSummaryJson)
+    hunderfossenStationSummariesJson.forEach(station => {
+      if (ids.includes(station.id)) results.push(station)
+    })
+    return Promise.resolve(results)
+  }
   // Create endpoint for either single station or array of stations
   const endpoint = createEndpointForArray(id, STATION_SUMMARY_ENDPOINT)
 
@@ -119,6 +158,18 @@ export async function fetchStationSummary (id) {
  * @async
  */
 export async function fetchStationDownload (id) {
+  if (DEV_MODE) {
+    console.log('🔧 DEV MODE: Using test-data station download')
+    const ids = Array.isArray(id) ? id : [id]
+    const results = []
+    if (ids.includes(stationDownloadJson.id)) results.push(stationDownloadJson)
+    hunderfossenStationSummariesJson.forEach(station => {
+      if (ids.includes(station.id)) {
+        results.push({ ...station, observations: station.observations })
+      }
+    })
+    return Promise.resolve(results)
+  }
   // Create endpoint for either single station or array of stations
   const endpoint = createEndpointForArray(id, STATION_DOWNLOAD_ENDPOINT)
 

@@ -105,43 +105,47 @@
 <!-- Input for handling custom species -->
 {#if !chooseAll}
   <div class='inputContainer'>
-    <!-- Input for adding a species to the custom species-->
-    <input
-      type='text'
-      bind:value={inputSpecies}
-      on:keydown={handleKeydown}
-      placeholder='Legg til art'/>
-    <button on:click={addSpecies} class='smallButton'>+</button>
+    <!-- Dropdown with all available species -->
+    <div class='dropdownContainer'>
+      <label for='speciesDropdown' class='dropdownLabel'>Velg arter:</label>
+      <select 
+        id='speciesDropdown'
+        class='speciesDropdown'
+        on:change={(e) => {
+          if (e.target.value) {
+            inputSpecies = e.target.value
+            addSpecies()
+            e.target.value = ''
+          }
+        }}
+      >
+        <option value=''>Velg fra lista...</option>
+        {#each selectableSpecies.sort() as species}
+          {#if !customSpecies.includes(species)}
+            <option value={species}>{capitalizeFirstLetter(species)}</option>
+          {/if}
+        {/each}
+      </select>
+    </div>
 
     <!-- Error message to display to the user -->
     {#if showError}
-      <p>{showError}</p>
-    {/if}
-
-    <!-- Suggestions based on user input -->
-    {#if showSuggestions}
-      <div class='suggestions'>
-        {#each suggestSpecies as species}
-          <button class='suggestSpecies' on:click={() => { inputSpecies = capitalizeFirstLetter(species); addSpecies() }}>
-            {capitalizeFirstLetter(species)}
-          </button>
-        {/each}
-      </div>
+      <p class='errorMessage'>{showError}</p>
     {/if}
   </div>
 
   <!-- Custom species choosen by user -->
   {#if customSpecies.length > 0}
-    <p>Valgte arter:</p>
-    <ul>
+    <p class='selectedTitle'>Valgte arter:</p>
+    <ul class='selectedSpeciesList'>
       {#each customSpecies as species}
-        <li>{capitalizeFirstLetter(species)} <button on:click={() => removeSpecies(species)} class='smallButton'>x</button></li>
+        <li class='speciesItem'>{capitalizeFirstLetter(species)} <button on:click={() => removeSpecies(species)} class='removeButton'>×</button></li>
       {/each}
     </ul>
 
     <!-- Option to include 'others' category -->
     {#if showIncludeOthers}
-      <label>
+      <label class='othersLabel'>
         <input type='checkbox' bind:checked={includeOthers}> Grupper og vis ikke valgte arter sammen
       </label>
     {/if}
@@ -168,63 +172,120 @@
     transform: scale(1.25);
   }
 
-  input[type='text'] {
-    width: 60%;
-    font-size: 16px;
-    padding: 0.5em;
-    margin: 0.5em 0;
-    border-radius: 0.5em;
-  }
-
-  .smallButton {
-    padding: 0.5em;
-    margin: 0.5em 0;
-    border-radius: 0.5em;
-    cursor: pointer;
-  }
-
-  .smallButton:hover {
-    background-color: var(--PCOLOR);
-    color: white;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 0;
-    margin-left: 0.5em;
-  }
-
   .inputContainer {
     position: relative;
     width: 100%;
+    margin: 1rem 0;
   }
 
-  .suggestions {
-    position: absolute;
-    width: 60%;
-    max-height: 150px;
-    overflow-y: auto;
+  .dropdownContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 1rem 0.5rem;
+  }
+
+  .dropdownLabel {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: default;
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .dropdownLabel:hover {
+    background-color: transparent;
+    color: #555;
+  }
+
+  .speciesDropdown {
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
     background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 0.5em;
-    z-index: 10;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
   }
 
-  .suggestSpecies {
-    display: block;
-    width: 100%;
-    padding: 0.5em;
-    text-align: left;
-    border: none;
+  .speciesDropdown:hover {
+    border-color: #b0b0b0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .speciesDropdown:focus {
+    outline: none;
+    border-color: #3366ff;
+    box-shadow: 0 0 0 3px rgba(51, 102, 255, 0.1);
+  }
+
+  .errorMessage {
+    color: #d32f2f;
+    font-size: 0.9rem;
+    margin: 0.5rem 0.5rem;
+    font-weight: 500;
+  }
+
+  .selectedTitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #333;
+    margin: 1rem 0.5rem 0.5rem 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .selectedSpeciesList {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .speciesItem {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #e3f2fd;
+    border: 1px solid #90caf9;
+    padding: 0.5rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    color: #1976d2;
+  }
+
+  .removeButton {
     background: none;
-    padding: 0.5em;
-    font-size: 14px;
+    border: none;
+    color: #1976d2;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    transition: color 0.2s ease;
   }
 
-  /* Show when a user hovers over the li */
-  .suggestSpecies:hover {
-    background-color: #435768;
+  .removeButton:hover {
+    color: #d32f2f;
+  }
+
+  .othersLabel {
+    display: block;
+    padding: 0.5rem 0.5rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    border-radius: 0.5em;
+  }
+
+  .othersLabel:hover {
+    background-color: var(--PCOLOR);
     color: white;
   }
 </style>

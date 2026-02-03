@@ -20,10 +20,18 @@ export function formatRiversForTable (rivers) {
 
   const rows = []
   rivers.forEach(river => {
+    // NOTE til backend/IT:
+    // Tabell-headerne for elver er: ['Navn', 'Dato', 'Prosjekt', 'Projektnummer'].
+    // Per i dag har River bare ett felt fra API-et: river.projectId (prosjektnummer).
+    // Derfor fyller vi midlertidig INN SAMME VERDI i både "Prosjekt" og "Projektnummer".
+    // Når API-et skiller mellom navn og nummer (f.eks. project_name og project_number):
+    //  1) legg til feltene i River.fromJson i models/River.js
+    //  2) oppdater raden under til å bruke riktig felt for hver kolonne.
     rows.push([
       river.id,
       river.name,
       river.startDate,
+      river.projectId || '',
       river.projectId || ''
     ])
   })

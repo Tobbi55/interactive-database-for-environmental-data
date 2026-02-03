@@ -9,6 +9,9 @@ import { FEEDBACK_TYPES, FEEDBACK_CODES, FEEDBACK_MESSAGES } from '../constants/
 import { authStore } from '../stores/authStore.js'
 import { reportError } from '../utils/report.js'
 
+// Check if running in dev mode without API URL
+const DEV_MODE = !AUTH_URL || AUTH_URL === 'undefined'
+
 /**
  * Log in user to server
  * @param {string} username - The username to authenticate with
@@ -78,6 +81,10 @@ export async function authLogout () {
  * @returns {Promise<boolean>} - A promise which resolves to if refresh was successful or not
  */
 export async function authRefresh () {
+  if (DEV_MODE) {
+    console.log('🔧 DEV MODE: Skipping auth refresh')
+    return Promise.resolve(true)
+  }
   try {
     // Try to refresh
     const response = await fetch(`${AUTH_URL}${REFRESH_ENDPOINT}`, {
