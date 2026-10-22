@@ -38,6 +38,9 @@
     <div class='navButton' role='button' class:active={$page.url.pathname === '/upload'}>
       <Button type='header' href='/upload' size='extended'>Last opp<img src='/uploadIcon.svg' alt='Upload' height='40em' class='headerIcon'></Button>
     </div>
+    <div class='navButton' role='button' class:active={$page.url.pathname === '/add-data'}>
+      <Button type='header' href='/add-data' size='extended'>Legg inn data<img src='/editIcon.svg' alt='Rediger' height='30em' class='headerIcon'></Button>
+    </div>
     <div class='navButton' role='button' class:active={$page.url.pathname === '/download'}>
       <Button type='header' href='/download' size='extended'>Last ned<img src='/downloadIcon.svg' alt='Download' height='40em' class='headerIcon'></Button>
     </div>
@@ -54,6 +57,7 @@
           <li><a href='/list'>Liste</a></li>
           <li><a href='/graph'>Graf</a></li>
           <li><a href='/upload'>Last opp</a></li>
+          <li><a href='/add-data'>Legg inn data</a></li>
           <li><a href='/download'>Last ned</a></li>
         </ul>
       </div>
@@ -91,7 +95,15 @@
     justify-content: space-between;
     align-items: center;
     height: 100%;
-    width: 60%;
+    width: 65%;
+  }
+
+  .navigation :global(a.extended) {
+    font-size: 1rem;
+  }
+
+  .navigation :global(.headerIcon) {
+    height: 28px !important;
   }
 
   .logoHeader{

@@ -6,6 +6,8 @@
 - [Hvordan bruke graf siden](#item-five)
 - [Hvordan laste ned data](#item-six)
 - [Hvordan laste opp ny data](#item-seven)
+- [Hvordan forhåndsvise stasjoner i kart](#item-eight)
+- [Hvordan importere APEX-data](#item-nine)
 
 
 <a id="item-one"></a>
@@ -18,7 +20,7 @@ Denne nettsiden er laget på vegne av Norsk Institutt for Naturforskning (NINA).
 
 For å kunne benytte seg av nettsiden må man være logget inn. Man kan gå gjennom nettsiden uten å være innlogget, men man vil ikke ha tilgang til dataene som benyttes av nettsiden. For å logge inn trykker man bare på "logg inn" øverst i venstre hjørne, for så å skrive inn sitt brukernavn og passord.
 
-Netsiden har 5 sider; Kart, Liste, Graf, Last opp, Last ned. Disse sidene har ulike formål og bruksområder. For å bytte mellom de ulike sidene er det bare å trykke på navnet til siden man ønsker å gå til.
+Nettsiden har sidene Kart, Liste, Graf, Last opp, Legg inn data og Last ned. Sidene har ulike formål og bruksområder. For å bytte mellom dem trykker man på navnet til siden man ønsker å gå til.
 
 ![General](./Images/General1.png "General")
 
@@ -47,6 +49,8 @@ I Art feltet(2) så har man mulighet til å begrense punktene som vises på kart
 
 I tilfellet over, så er "Laks" og "Ørekyte" valgt, og typen data er "elvedata". Da vil punkter som tilhører elver hvor enten laks eller ørekyte (eller begge) har blitt observert.
 
+Når du velger "Stasjonsdata", kan du også krysse av for "Vis stasjonsdata med separate farger". Da får stasjoner som hører til samme elvedata samme farge, mens ulike elvedata vises med forskjellige farger. Valget er av som standard.
+
 Hvis man synes filter siden tar for mye plass, og ønsker og lukke den er det bare å trykke på knappen til høyre på Filter menyen.
 
 ![Map](./Images/Map4.png "Map")
@@ -58,6 +62,8 @@ Det finnes flere valgmuligheter for selve kartet. Det første et at man kan zoom
 Man kan også velge mellom ulike typer kart. Dette gjør man nederst i høyre hjørne. Man kan vegle mellom terreng, satelitt og topologisk.
 
 Alle punktene på kartet er interaktive, som vil si at man kan trykke på de. Trykker man på et punkt for man opp all dataen for det punktet. Dataen varierer utifra om man har trykket på et elvedatapunkt eller et stasjonsdatapunkt. En stasjon består som sagt av to punkter og en linje, men det telles som et objekt. Trykker man på start/slutt punktet, så vises samme data. Et valgt punkt blir oransje, dette gjelder for både elver og stasjoner.
+
+Holder du musepekeren over et elvepunkt, vises elvenavn og dato. Over et start- eller stoppunkt eller en stasjonslinje vises elvenavn, stasjonsnummer i formatet "St XX" og dato.
 
 ![Map](./Images/Map6.png "Map")
 
@@ -138,6 +144,8 @@ På denne siden finnes to knapper. Den ene brukes for å velge hvilke filer man 
 
 Når man trykker på knapp 1 så opner den opp "file explorer" på din pc. Da er det bare å bla seg fram til filen man ønsker å laste opp, velge den, for så å trykke åpne. Man har bare mulighet til å velge excel filer, siden disse er de eneste filene som er godtatt. Filer som ikke følger riktig format vil heller ikke bli lastet opp, så den kan være lurt å sjekke dette før man laster opp.
 
+Du kan laste ned arbeidsboken «Importmal» fra lenken på opplastingssiden. Bruk malen som utgangspunkt for å kontrollere at ark og kolonner følger formatet som forventes.
+
 Når man har valgt filen så er det bare å trykke last opp. 
 
 ![Upload](./Images/Upload3.png "Upload")
@@ -183,3 +191,32 @@ Det siste man gjør er å trykke på last ned knappen på bunnen av siden. Denne
 
 ![Download](./Images/Download7.png "Download")
 
+<a id="item-eight"></a>
+# Hvordan forhåndsvise stasjoner i kart
+
+På siden «Legg inn data» kan du trykke på «Forhåndsvis stasjoner i kart» for å se stasjonenes start- og stoppunkt. Hvert punkt er merket med stasjonsnummer og med S for start eller T for stopp. Tabellen under kartet viser stasjonsnummer, klokkeslett, start- og stoppkoordinater, transektlengde og sekunder fisket.
+
+Når du importerer en APEX-fil, får stasjoner uten valgt båttype «Cataraft» som standard. Et båttypevalg du allerede har gjort, beholdes.
+
+Når stasjonsnummer og båttype er satt, vises tomme felt i stasjonsdetaljene med lys rød bakgrunn. Klikk på en tabellrad for å zoome kartet til stasjonen. Bruk musehjulet over kartet for å zoome; siden bak popupen holdes låst mens popupen er åpen. Kartet og tabellen deler plassen likt når popupen åpnes. Dra i skillet mellom dem for å endre størrelsesforholdet, eller fokuser skillet og bruk pil opp/ned på tastaturet. Når tabellen er mindre enn innholdet, kan den rulles uavhengig.
+
+«Rediger» ligger øverst til høyre. Du kan redigere alle tabellfeltene: stasjonsnummer, klokkeslett, koordinater, transektlengde og sekunder fisket. Dra i håndtaket ved stasjonsnummeret for å flytte hele stasjonsraden. Data og fiskeobservasjoner følger stasjonen når rekkefølgen endres. Nummer må være positive heltall og unike. Koordinater skrives med komma som desimalskilletegn, og bredde-/lengdegrad må være innenfor gyldig område. Når start- eller stoppkoordinater endres, beregnes transektlengden som rettlinjet avstand mellom de to endepunktene. Ingen GPS-punkter mellom endepunktene brukes i denne beregningen, heller ikke for APEX-importerte stasjoner. Lengden fjernes når start- eller stoppkoordinater mangler.
+
+«Lagre endringer» oppdaterer stasjonsinformasjonen og rekkefølgen i skjemaet på «Legg inn data». «Avbryt redigering» forkaster endringene siden sist lagring. Hvis du lukker kartvinduet med ulagrede endringer, blir du spurt om du vil forkaste dem. Forhåndsvisningen viser ikke fiskeobservasjoner, og kartendringene sendes ikke til backend.
+
+<a id="item-nine"></a>
+# Hvordan importere APEX-data
+
+På «Legg inn data» kan du velge «Importer APEX-data» for å lese en APEX-logger lokalt i nettleseren. Trykk «Hjelp» ved importknappen for å se en forklaring med et eksempel på en trends-fil. Import, validering og forhåndsvisning sender ikke CSV-data til backend.
+
+Over elveinformasjonen finner du fire visningsknapper: vis/skjul elveinformasjon, vis/skjul alle stasjonsdata, vis/skjul alle fiskeobservasjoner og åpne kartforhåndsvisningen. Stasjonsdata og fiskeobservasjoner kan også skjules hver for seg med knappen i den aktuelle stasjonsdelen eller observasjonstabellen. Overskriften på hver tabell viser stasjonsnummeret, for eksempel «Fiskeobservasjoner for Stasjon 2». Når stasjonsdata skjules, står stasjonsoverskriften igjen sammen med den tilhørende fiskeobservasjonstabellen.
+
+Knappen «Publiser data» ligger nederst i skjemaet, men er foreløpig deaktivert. Den må kobles til backend før skjemaet kan sende data til serveren og databasen.
+
+Velg én `*_trends.csv`-fil. Tilsvarende `*_faults.csv`- og `*_events.csv`-filer kan velges i tillegg, men er valgfrie; de brukes til filkontroll og advarsler, ikke til å fylle ut stasjonsverdiene. Velger du flere filer, må de tilhøre samme APEX-enhet. Trends-filen må ha de forventede kolonnene. Feil filtype, ugyldig CSV eller manglende obligatoriske kolonner vises som en tydelig feil.
+
+Importen deler trends-radene i stasjoner ved timer-nullstilling eller tydelig timer-tilbakegang og nummererer stasjonene fra 1. Dato og starttid hentes fra første rad i sekvensen. Startpunktet hentes normalt fra `Timer (s) = 5`; hvis dette punktet mangler, brukes første gyldige GPS-punkt ved eller etter timer 5, med en advarsel. Stoppunkt og «Sekunder fisket» bruker høyeste timerverdi i sekvensen.
+
+Volt og puls leses fra `Waveform`, mens «Display» beregnes som gjennomsnittet av `Average Current (A)`. Ved varierende eller tvetydige verdier vises advarsler for manuell kontroll. Transektlengden beregnes ved import fra avstanden mellom påfølgende gyldige GPS-punkter. Hvis du senere endrer start- eller stoppkoordinater, beregnes lengden på nytt som rettlinjet avstand kun mellom disse punktene; mellomliggende GPS-punkter brukes ikke. Fiskedata, elvetype, vær, temperaturer, ledningsevne og stasjonsbeskrivelse registreres fortsatt manuelt.
+
+Når du bruker de importerte verdiene, overskrives APEX-mappede felter i de aktuelle stasjonene. Manuelle felt og fiskeobservasjoner i stasjoner som beholdes, bevares. Hvis importen vil fjerne stasjoner som inneholder manuelle data eller fiskeobservasjoner, må du bekrefte dette før importen fortsetter. Stasjoner uten valgt båttype får «Cataraft» som standard; et eksisterende båttypevalg beholdes. Kontroller advarslene og rediger verdiene før videre bruk.

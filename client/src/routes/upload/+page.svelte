@@ -7,7 +7,6 @@
   import { addFeedbackToStore } from '../../utils/addFeedbackToStore.js'
   import UserFeedbackMessage from '$lib/UserFeedbackMessage.svelte'
   import Button from '$lib/user-input/Button.svelte'
-  import { parseAndValidateExcel } from '../../utils/validation.js'
   import { uploadFileToServer } from '../../api/upload.js'
 
   let selectedFile = null
@@ -100,8 +99,9 @@
 
   <!-- Defines the text under the upload files box -->
   <div class='uploadFilesBoxText'>
-    <p>Maksimal fil størrelse: 10 MB</p>
-    <p>Kun tillatt å laste opp filer av typen: .xlsx</p>
+    <p>Max 10 MB</p>
+    <p>Kun .xlsx</p>
+    <p><a class='templateDownload' href='/importmal.xlsx' download='importmal.xlsx'>Last ned Importmal her</a></p>
   </div>
 
   <!-- Defines the overview over files selected -->
@@ -159,6 +159,10 @@
     max-width: 900px;
     padding: 1rem;
     text-align: left;
+  }
+
+  .templateDownload {
+    color: var(--PCOLOR);
   }
 
   .uploadFileUploaded {
