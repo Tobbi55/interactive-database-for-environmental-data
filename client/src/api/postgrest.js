@@ -80,6 +80,14 @@ export async function fetchRivers () {
 }
 
 /**
+ * Fetches river names and station IDs for map labels and coloring.
+ * @returns {Promise<object[]>} River IDs and their station IDs
+ */
+export async function fetchRiverStations () {
+  return fetchFromPostgrest(`${RIVER_SUMMARY_ENDPOINT}?select=id,name,stations`)
+}
+
+/**
  * Fetches data needed for the stations on the map and list page
  * @returns {Promise} - A promise which resolves to json data
  * @async

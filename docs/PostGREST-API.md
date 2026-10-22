@@ -20,6 +20,13 @@ Use the following request to get all river with their underlying species for fil
 Use the following request to get all stations with their underlying species for filtering:
 `GET /station_with_species`
 
+To color stations by their parent river, also fetch the station-to-river relationships:
+`GET /river_summary?select=id,name,stations`
+
+The station list endpoint does not include `river_id`, so this relationship is needed to
+label station tooltips with the river name and give all stations belonging to the same
+river the same map color.
+
 
 ### Get summary information for a river
 For a choosen river, we want to retrieve the following information if it has not already been retrived.

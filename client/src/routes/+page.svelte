@@ -1,7 +1,7 @@
 <script>
   import LeafletMap from './LeafletMap.svelte'
   import Filter from '$lib/Filter.svelte'
-  import { getRivers, getStations, getRiverSummary, getStationSummary } from '../utils/dataManager.js'
+  import { getRivers, getStations, getStationRiverMap, getRiverSummary, getStationSummary } from '../utils/dataManager.js'
   import { getSelectableSpecies, filterRiversByDateAndSpecies, filterStationsByDateAndSpecies } from '../utils/filterData.js'
   import { riverStore } from '../stores/riverStore.js'
   import { stationStore } from '../stores/stationStore.js'
@@ -23,9 +23,11 @@
 
   let rivers = new Map() // Rivers with coordinates
   let stations = new Map() // Stations with coordinates
+  let stationRivers = new Map()
   let selectableSpecies // All unique species
 
   let dataType = DATATYPE_RIVER // 'river' or 'station', chosen by user
+  let showSeparateStationColors = false
   let selectedSpecies // Species user wants to look at
   let selectedStartDate // Start date for the time user wants to look at
   let selectedEndDate // End date for the time user wants to look at
@@ -64,7 +66,12 @@
 
   onMount(async () => {
     // Get rivers and stations from API
-    await Promise.all([getRivers(), getStations()])
+    const [, , fetchedStationRivers] = await Promise.all([
+      getRivers(),
+      getStations(),
+      getStationRiverMap()
+    ])
+    stationRivers = fetchedStationRivers
     // Get if the user has selected a river or station from URL
     getUrlParams()
   })
@@ -185,6 +192,8 @@
 <!-- Map with rivers and stations -->
 <LeafletMap
   {dataType}
+  {showSeparateStationColors}
+  {stationRivers}
   rivers={filteredRivers}
   stations={filteredStations}
   {selectedRiver}
@@ -200,7 +209,8 @@
         bind:dataType
         bind:selectedSpecies
         bind:selectedStartDate
-        bind:selectedEndDate/>
+        bind:selectedEndDate
+        bind:showSeparateStationColors/>
     </Sidebar>
 </div>
 

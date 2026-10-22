@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { getRivers, getStations, getRiverSummary, getStationSummary, getRiverForDownload, getStationForDownload } from './dataManager.js'
+import { getRivers, getStations, getStationRiverMap, getRiverSummary, getStationSummary, getRiverForDownload, getStationForDownload } from './dataManager.js'
 import * as postgrest from '../api/postgrest.js'
 import * as checkIfDataExists from './checkIfDataExists.js'
 import * as addFeedbackToStore from './addFeedbackToStore.js'
@@ -13,6 +13,7 @@ import { get } from 'svelte/store'
 vi.mock('../api/postgrest', () => ({
   fetchRivers: vi.fn(),
   fetchStations: vi.fn(),
+  fetchRiverStations: vi.fn(),
   fetchRiverSummary: vi.fn(),
   fetchStationSummary: vi.fn(),
   fetchStationDownload: vi.fn()
@@ -54,6 +55,26 @@ vi.mock('../stores/stationStore', () => ({
     set: vi.fn()
   }
 }))
+
+describe('test getStationRiverMap function', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  it('maps every station to its river', async () => {
+    postgrest.fetchRiverStations.mockResolvedValue([
+      { id: 1, name: 'River One', stations: [1, 2] },
+      { id: 3, name: 'River Three', stations: [100] }
+    ])
+
+    await expect(getStationRiverMap()).resolves.toEqual(new Map([
+      [1, { id: 1, name: 'River One' }],
+      [2, { id: 1, name: 'River One' }],
+      [100, { id: 3, name: 'River Three' }]
+    ]))
+  })
+
+})
 
 describe('test getRivers function', () => {
   beforeEach(() => {

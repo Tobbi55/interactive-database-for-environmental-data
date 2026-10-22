@@ -1,7 +1,14 @@
 <script>
     import { onMount, onDestroy, createEventDispatcher } from 'svelte'
-    import { redIcon, orangeIcon, blueIcon } from '../constants/leafletIcons.js'
     import { mapLayers } from '../constants/leafletLayers.js'
+    import {
+      createMapTooltipContent,
+      createStationMapTooltipContent,
+      getStationMapColors,
+      RIVER_MARKER_STYLE,
+      SELECTED_MARKER_STYLE,
+      STATION_MARKER_STYLE
+    } from '../utils/mapDisplay.js'
     import leaflet from 'leaflet'
 
     const dispatch = createEventDispatcher()
@@ -9,6 +16,8 @@
     export let stations // Imported data containg station objects
     export let rivers // Imported data containg river objects
     export let dataType // Defines data type chosen by user
+    export let showSeparateStationColors = false
+    export let stationRivers = new Map()
 
     export let selectedRiver // The river the user has chosen
     export let selectedStation // The station the user has chosen
@@ -26,7 +35,7 @@
     const stationLayerGroup = leaflet.layerGroup()
 
     // update river or station points when they change
-    $: if (map && (rivers || stations || dataType)) {
+    $: if (map && (rivers || stations || dataType || showSeparateStationColors || stationRivers)) {
       updateMap()
     }
 
@@ -125,8 +134,9 @@
     function updateStations () {
       // Add each station not already added to the map
       stations.forEach(station => {
-        // Checks if the station already has a marker
-        if (stationMarkers.has(station.id)) {
+        const existingMarker = stationMarkers.get(station.id)
+        if (existingMarker) {
+          applyStationStyle(station, existingMarker)
           return
         }
 
@@ -157,20 +167,28 @@
       // Get start and end position of the station
       const startPos = [station.startPos.coordinates[1], station.startPos.coordinates[0]]
       const endPos = [station.endPos.coordinates[1], station.endPos.coordinates[0]]
+      const colors = getStationMapColors(station, showSeparateStationColors, stationRivers)
+      const markerStyle = { ...STATION_MARKER_STYLE, ...colors }
+      const lineColor = showSeparateStationColors ? colors.color : 'red'
+      const riverName = stationRivers.get(station.id)?.name
+      const tooltipContent = () => createStationMapTooltipContent(riverName, station.name, station.id, station.date)
 
-      // creates a marker for the start position of the station
-      const startMarker = leaflet.marker(startPos, { icon: redIcon })
+      // Draw the endpoints as circles so each river group can have its own color.
+      const startMarker = leaflet.circleMarker(startPos, markerStyle)
         .addTo(stationLayerGroup)
+        .bindTooltip(tooltipContent(), { sticky: true })
         .on('click', () => dispatch('stationClicked', { id: station.id }))
 
-      // creates a marker for the end position of the station
-      const endMarker = leaflet.marker(endPos, { icon: redIcon })
+      // Use the same group color and tooltip for the second endpoint.
+      const endMarker = leaflet.circleMarker(endPos, markerStyle)
         .addTo(stationLayerGroup)
+        .bindTooltip(tooltipContent(), { sticky: true })
         .on('click', () => dispatch('stationClicked', { id: station.id }))
 
-      // drawing the line between the start and end position of the station
-      const polyline = leaflet.polyline([startPos, endPos], { color: 'red' })
+      // Connect the endpoints and make the line interactive like the markers.
+      const polyline = leaflet.polyline([startPos, endPos], { color: lineColor })
         .addTo(stationLayerGroup)
+        .bindTooltip(tooltipContent(), { sticky: true })
         .on('click', () => dispatch('stationClicked', { id: station.id }))
 
       // Return the markers and line in a object
@@ -184,7 +202,23 @@
     }
 
     /**
-     * Selects the station by changing the colors of the markers and zooming in on the station
+     * Apply the active group color while keeping the selected station highlighted.
+     * @param {object} station - The station represented by the markers
+     * @param {object} marker - The station's start, end, and line markers
+     */
+    function applyStationStyle (station, marker) {
+      marker.colors = getStationMapColors(station, showSeparateStationColors, stationRivers)
+      const markerStyle = { ...STATION_MARKER_STYLE, ...marker.colors }
+      const isSelected = selectedStation?.id === station.id
+      const lineColor = showSeparateStationColors ? marker.colors.color : 'red'
+
+      marker.startMarker.setStyle(isSelected ? SELECTED_MARKER_STYLE : markerStyle)
+      marker.endMarker.setStyle(isSelected ? SELECTED_MARKER_STYLE : markerStyle)
+      marker.line.setStyle({ color: isSelected ? 'orange' : lineColor })
+    }
+
+    /**
+     * Selects a station, highlights it, and zooms to its start point.
      * Deselects the previous selected station
      * @param {object} station - The station to select
      */
@@ -194,13 +228,15 @@
 
       // Get the markers for the selected station
       const marker = stationMarkers.get(station.id)
+      if (!marker) {
+        return
+      }
 
       // Set the selected station to orange
-      marker.startMarker.setIcon(orangeIcon)
-      marker.endMarker.setIcon(orangeIcon)
+      marker.startMarker.setStyle(SELECTED_MARKER_STYLE)
+      marker.endMarker.setStyle(SELECTED_MARKER_STYLE)
       marker.line.setStyle({ color: 'orange' })
 
-      // Pan to the selected station and zoom in
       map.flyTo(marker.startMarker.getLatLng(), 13, { duration: 0.5 })
 
       // Save the selected station as the previous selected station
@@ -226,9 +262,7 @@
       }
 
       // Revert the colors of the markers
-      oldSelectedMarker.startMarker.setIcon(redIcon)
-      oldSelectedMarker.endMarker.setIcon(redIcon)
-      oldSelectedMarker.line.setStyle({ color: 'red' })
+      applyStationStyle(station, oldSelectedMarker)
     }
 
     /**
@@ -242,11 +276,12 @@
           return
         }
 
-        // Create a marker for the river
-        const marker = leaflet.marker(
+        // Use circles so the selected state matches the station markers.
+        const marker = leaflet.circleMarker(
           [river.position.coordinates[1], river.position.coordinates[0]],
-          { icon: blueIcon })
+          RIVER_MARKER_STYLE)
           .addTo(riverLayerGroup)
+          .bindTooltip(createMapTooltipContent(river.name, river.startDate, 'Elv'), { sticky: true })
           .on('click', () => dispatch('riverClicked', { id: river.id }))
 
         // Store the marker in a map using the river id as key
@@ -275,9 +310,8 @@
       const marker = riverMarkers.get(river.id)
 
       // Set the selected river to orange
-      marker.setIcon(orangeIcon)
+      marker.setStyle(SELECTED_MARKER_STYLE)
 
-      // Pan to the selected station and zoom in
       map.flyTo(marker.getLatLng(), 11, { duration: 0.5 })
 
       // Save the selected river as the previous selected river
@@ -303,7 +337,7 @@
       }
 
       // Revert the color of the marker
-      oldSelectedMarker.setIcon(blueIcon)
+      oldSelectedMarker.setStyle(RIVER_MARKER_STYLE)
     }
 </script>
 

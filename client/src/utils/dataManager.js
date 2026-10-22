@@ -2,6 +2,7 @@ import { get } from 'svelte/store'
 import {
   fetchRivers,
   fetchStations,
+  fetchRiverStations,
   fetchRiverSummary,
   fetchStationSummary,
   fetchStationDownload
@@ -23,6 +24,7 @@ import { filtersStationsByRiver } from './filterData.js'
 import {
   validateRiverWithSpecies,
   validateStationWithSpecies,
+  validateRiverStations,
   validateRiverSummary,
   validateStationSummary,
   validateStationDownload
@@ -133,6 +135,33 @@ export async function getRivers () {
   } catch (error) {
     reportError(error)
     addFeedbackToStore(FEEDBACK_TYPES.ERROR, FEEDBACK_CODES.POSTGREST_UNAVAILABLE, FEEDBACK_MESSAGES.POSTGREST_UNAVAILABLE)
+  }
+}
+
+/**
+ * Gets the river name and ID for each station.
+ * @returns {Promise<Map<number, {id: number, name: string}>>} A map from station ID to river
+ */
+export async function getStationRiverMap () {
+  try {
+    const riverStations = await fetchRiverStations()
+
+    if (!riverStations || !validateRiverStations(riverStations)) {
+      return new Map()
+    }
+
+    return new Map(
+      riverStations.flatMap(({ id, name, stations }) =>
+        stations.map(stationId => [
+          stationId,
+          { id, name }
+        ])
+      )
+    )
+  } catch (error) {
+    reportError(error)
+    addFeedbackToStore(FEEDBACK_TYPES.ERROR, FEEDBACK_CODES.POSTGREST_UNAVAILABLE, FEEDBACK_MESSAGES.POSTGREST_UNAVAILABLE)
+    return new Map()
   }
 }
 

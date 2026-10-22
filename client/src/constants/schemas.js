@@ -92,6 +92,17 @@ const schemaSingleRiverSummary = {
   additionalProperties: false
 }
 
+const schemaSingleRiverStations = {
+  type: 'object',
+  properties: {
+    id: { type: 'integer' },
+    name: { type: 'string' },
+    stations: { type: 'array', items: { type: 'integer' } }
+  },
+  required: ['id', 'name', 'stations'],
+  additionalProperties: false
+}
+
 const schemaSingleStationSummary = {
   type: 'object',
   properties: {
@@ -143,6 +154,11 @@ export const schemaStationWithSpecies = {
 export const schemaRiverSummary = {
   type: 'array',
   items: schemaSingleRiverSummary
+}
+
+export const schemaRiverStations = {
+  type: 'array',
+  items: schemaSingleRiverStations
 }
 
 export const schemaStationSummary = {

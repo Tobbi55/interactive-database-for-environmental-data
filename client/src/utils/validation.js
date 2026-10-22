@@ -5,6 +5,7 @@ import {
   schemaRiverWithSpecies,
   schemaStationWithSpecies,
   schemaRiverSummary,
+  schemaRiverStations,
   schemaStationSummary,
   schemaStationDownload,
   schemaRiverSheet,
@@ -115,6 +116,15 @@ export function validateStationWithSpecies (data) {
  */
 export function validateRiverSummary (data) {
   return validateJson(data, schemaRiverSummary)
+}
+
+/**
+ * Validate river-to-station relationships.
+ * @param {object[]} data - The river IDs and their station IDs
+ * @returns {boolean} - If the relationships are valid
+ */
+export function validateRiverStations (data) {
+  return validateJson(data, schemaRiverStations)
 }
 
 /**
