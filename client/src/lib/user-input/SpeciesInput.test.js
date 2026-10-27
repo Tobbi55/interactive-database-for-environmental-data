@@ -1,25 +1,27 @@
-import { render, fireEvent } from '@testing-library/svelte'
-import { describe, expect, it } from 'vitest'
+import { cleanup, render, fireEvent } from '@testing-library/svelte'
+import { afterEach, describe, expect, it } from 'vitest'
 import SpeciesInput from './SpeciesInput.svelte'
 
 /**
  * @vitest-environment jsdom
  */
 
-// problem with fire events, still havent solved it
-describe('SpeciesInput', () => {
-  it('adds species to customSpecies and displays error for invalid species', async () => {
-    const { getByPlaceholderText, getByText } = render(SpeciesInput, { selectableSpecies: ['test species'], customSpecies: [], chooseAll: false })
+afterEach(cleanup)
 
-    const input = getByPlaceholderText('Legg til art')
-    await fireEvent.input(input, { target: { value: 'test species' } })
-    await fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
+describe('SpeciesInput', () => {
+  it('adds a selected species and removes it from the available options', async () => {
+    const { getByRole, getByText, queryByRole } = render(SpeciesInput, {
+      props: {
+        selectableSpecies: ['test species'],
+        customSpecies: [],
+        chooseAll: false
+      }
+    })
+
+    const select = getByRole('combobox', { name: 'Velg arter:' })
+    await fireEvent.change(select, { target: { value: 'test species' } })
 
     expect(getByText('Test species')).toBeTruthy()
-
-    await fireEvent.input(input, { target: { value: 'invalid species' } })
-    await fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' })
-
-    expect(getByText('Art finnes ikke')).toBeTruthy()
+    expect(queryByRole('option', { name: 'Test species' })).toBeNull()
   })
 })

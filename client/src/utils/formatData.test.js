@@ -35,7 +35,7 @@ vi.mock('./calculateData.js', () => ({
 describe('test formatRiversForTable function', () => {
   it('should return headers and an empty rows array if the input map is empty', () => {
     const formatted = formatRiversForTable(new Map())
-    expect(formatted.headers).toEqual(['Navn', 'Dato', 'Projektnummer'])
+    expect(formatted.headers).toEqual(['Navn', 'Dato', 'Prosjekt', 'Projektnummer'])
     expect(formatted.rows).toEqual([])
   })
 
@@ -45,10 +45,10 @@ describe('test formatRiversForTable function', () => {
       [1, new River({ id: '2', name: 'Name2', startDate: '2024-01-15', projectId: 'prosjekt2' })]
     ])
     const formatted = formatRiversForTable(rivers)
-    expect(formatted.headers).toEqual(['Navn', 'Dato', 'Projektnummer'])
+    expect(formatted.headers).toEqual(['Navn', 'Dato', 'Prosjekt', 'Projektnummer'])
     expect(formatted.rows).toEqual([
-      ['1', 'Name1', '2024-01-01', 'prosjekt1'],
-      ['2', 'Name2', '2024-01-15', 'prosjekt2']
+      ['1', 'Name1', '2024-01-01', 'prosjekt1', 'prosjekt1'],
+      ['2', 'Name2', '2024-01-15', 'prosjekt2', 'prosjekt2']
     ])
   })
 })

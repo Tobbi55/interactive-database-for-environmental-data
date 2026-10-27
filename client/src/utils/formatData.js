@@ -20,11 +20,15 @@ export function formatRiversForTable (rivers) {
 
   const rows = []
   rivers.forEach(river => {
+    // The API currently provides only a project number, so both columns use it
+    // until the backend exposes a separate project name.
+    const projectNumber = river.projectId || ''
     rows.push([
       river.id,
       river.name,
       river.startDate,
-      river.projectId || ''
+      projectNumber,
+      projectNumber
     ])
   })
 
