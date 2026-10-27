@@ -5,6 +5,7 @@ import {
   getStationMapSnapshot,
   isValidMapPosition,
   parseMapCoordinate,
+  parseMapPosition,
   validateStationMapDrafts
 } from './stationMapPreview.js'
 
@@ -47,6 +48,8 @@ describe('station map preview helpers', () => {
     expect(parseMapCoordinate('61.25')).toBeNull()
     expect(formatMapCoordinate(61.2500012)).toBe('61,250001')
     expect(isValidMapPosition('61,25', '10,42')).toBe(true)
+    expect(parseMapPosition('61,25', '10,42')).toEqual([61.25, 10.42])
+    expect(parseMapPosition('91', '10')).toBeNull()
     expect(isValidMapPosition('91', '10')).toBe(false)
     expect(isValidMapPosition('61', '181')).toBe(false)
   })

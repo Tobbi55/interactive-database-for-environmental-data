@@ -81,9 +81,21 @@ export function parseMapCoordinate (value) {
  * @returns {boolean} Whether the pair is complete and in range
  */
 export function isValidMapPosition (latitude, longitude) {
+  return parseMapPosition(latitude, longitude) !== null
+}
+
+/**
+ * Parse a valid latitude/longitude pair for Leaflet.
+ * @param {string} latitude - Latitude input
+ * @param {string} longitude - Longitude input
+ * @returns {[number, number]|null} Leaflet position or null when invalid
+ */
+export function parseMapPosition (latitude, longitude) {
   const lat = parseMapCoordinate(latitude)
   const lon = parseMapCoordinate(longitude)
   return lat !== null && lon !== null && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180
+    ? [lat, lon]
+    : null
 }
 
 /**

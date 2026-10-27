@@ -5,9 +5,8 @@
     createStationMapDrafts,
     formatMapCoordinate,
     getStationMapSnapshot,
-    isValidMapPosition,
     loadStationMapResources,
-    parseMapCoordinate,
+    parseMapPosition,
     validateStationMapDrafts
   } from '../utils/stationMapPreview.js'
   import { estimateEditedTransectLength } from '../utils/apexStationDrafts.js'
@@ -37,8 +36,8 @@
   $: hasChanges = getStationMapSnapshot(draftStations) !== initialSnapshot
   $: validationErrors = validateStationMapDrafts(draftStations)
   $: missingPositionCount = draftStations.reduce((count, station) => count +
-    Number(!isValidMapPosition(station.startLat, station.startLong)) +
-    Number(!isValidMapPosition(station.endLat, station.endLong)), 0)
+    Number(parseMapPosition(station.startLat, station.startLong) === null) +
+    Number(parseMapPosition(station.endLat, station.endLong) === null), 0)
   $: if (map && draftStations && isEditing !== undefined) {
     const shouldFitMap = fitMapOnRefresh
     refreshMap(draftStations, isEditing, shouldFitMap)
@@ -113,7 +112,7 @@
         refreshMap(draftStations, isEditing)
         requestAnimationFrame(() => map?.invalidateSize())
       } catch (error) {
-        console.error('Kunne ikke åpne stasjonskartet', error)
+        console.error('Unable to initialize the station map', error)
         mapError = 'Kartet kunne ikke åpnes. Du kan fortsatt kontrollere og redigere koordinatene i tabellen.'
       }
     }
@@ -138,14 +137,8 @@
     const positions = []
 
     stationDrafts.forEach(station => {
-      const startValid = isValidMapPosition(station.startLat, station.startLong)
-      const endValid = isValidMapPosition(station.endLat, station.endLong)
-      const startPosition = startValid
-        ? [parseMapCoordinate(station.startLat), parseMapCoordinate(station.startLong)]
-        : null
-      const endPosition = endValid
-        ? [parseMapCoordinate(station.endLat), parseMapCoordinate(station.endLong)]
-        : null
+      const startPosition = parseMapPosition(station.startLat, station.startLong)
+      const endPosition = parseMapPosition(station.endLat, station.endLong)
 
       if (startPosition) positions.push(startPosition)
       if (endPosition) positions.push(endPosition)
@@ -192,13 +185,9 @@
     if (!map || !leaflet) return
 
     const positions = [
-      isValidMapPosition(station.startLat, station.startLong)
-        ? [parseMapCoordinate(station.startLat), parseMapCoordinate(station.startLong)]
-        : null,
-      isValidMapPosition(station.endLat, station.endLong)
-        ? [parseMapCoordinate(station.endLat), parseMapCoordinate(station.endLong)]
-        : null
-    ].filter(Boolean)
+      parseMapPosition(station.startLat, station.startLong),
+      parseMapPosition(station.endLat, station.endLong)
+    ].filter(position => position !== null)
 
     if (positions.length === 0) return
 
@@ -362,10 +351,10 @@
       }
       if (fitMap) {
         const endpoint = field.startsWith('start') ? 'start' : 'end'
-        fitMapOnRefresh = isValidMapPosition(
+        fitMapOnRefresh = parseMapPosition(
           updatedStation[`${endpoint}Lat`],
           updatedStation[`${endpoint}Long`]
-        )
+        ) !== null
       }
       return updatedStation
     })
@@ -437,8 +426,8 @@
    * @returns {boolean} Whether both endpoints are valid
    */
   function hasValidStationEndpoints (station) {
-    return isValidMapPosition(station.startLat, station.startLong) &&
-      isValidMapPosition(station.endLat, station.endLong)
+    return parseMapPosition(station.startLat, station.startLong) !== null &&
+      parseMapPosition(station.endLat, station.endLong) !== null
   }
 </script>
 

@@ -51,7 +51,7 @@
         }
       })
     } catch (error) {
-      console.error('Kunne ikke validere APEX-filene', error)
+      console.error('Unable to validate the APEX files', error)
       errorMessage = error instanceof Error
         ? error.message
         : 'En ukjent feil oppstod ved lesing av APEX-filene.'

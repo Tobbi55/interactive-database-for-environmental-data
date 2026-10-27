@@ -341,6 +341,17 @@
   }
 
   /**
+   * Report a failure while applying validated APEX data.
+   * @param {unknown} error - The error raised while updating the station form
+   */
+  function reportApexImportFailure (error) {
+    console.error('Could not apply APEX station data', error)
+    apexImportError = error instanceof Error
+      ? error.message
+      : 'En ukjent feil oppstod da APEX-dataene skulle fylles inn.'
+  }
+
+  /**
    * Clear feedback from a previous import when a new file selection begins.
    */
   function clearApexImportMessages () {
@@ -359,7 +370,7 @@
 
     if (!Array.isArray(data?.stations) || data.stations.length === 0 || !Array.isArray(data.warnings)) {
       apexImportError = 'APEX-importen ga ikke gyldige stasjonsutkast. Kontroller filene og prøv igjen.'
-      console.error('Ugyldig APEX-importresultat mottatt fra importpanelet', data)
+      console.error('Received an invalid APEX import result from the import panel', data)
       return
     }
 
@@ -381,10 +392,7 @@
     try {
       applyApexImport(drafts, warnings)
     } catch (error) {
-      console.error('Kunne ikke fylle stasjonsskjemaet med APEX-data', error)
-      apexImportError = error instanceof Error
-        ? error.message
-        : 'En ukjent feil oppstod da APEX-dataene skulle fylles inn.'
+      reportApexImportFailure(error)
     }
   }
 
@@ -406,11 +414,8 @@
     try {
       applyApexImport(pendingImport.drafts, pendingImport.warnings)
     } catch (error) {
-      console.error('Kunne ikke fylle stasjonsskjemaet med APEX-data', error)
       pendingApexImport = null
-      apexImportError = error instanceof Error
-        ? error.message
-        : 'En ukjent feil oppstod da APEX-dataene skulle fylles inn.'
+      reportApexImportFailure(error)
     }
   }
 
@@ -644,14 +649,14 @@
       updates.some(update => !stationKeys.has(update.key)) ||
       stationKeys.size !== updateKeys.size) {
       stationMapError = 'Kartendringene kunne ikke knyttes til stasjonene. Lukk kartet og prøv igjen.'
-      console.error('Ugyldig stasjonsliste mottatt fra kartforhåndsvisningen', updates)
+      console.error('Received an invalid station list from the map preview', updates)
       return
     }
 
     const validationErrors = validateStationMapDrafts(updates)
     if (validationErrors.length > 0) {
       stationMapError = `Kartendringene er ugyldige: ${validationErrors.join(' ')}`
-      console.error('Kartforhåndsvisningen sendte ugyldige stasjonsverdier', validationErrors)
+      console.error('The map preview returned invalid station values', validationErrors)
       return
     }
 
