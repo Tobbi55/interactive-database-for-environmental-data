@@ -73,7 +73,6 @@ describe('test getStationRiverMap function', () => {
       [100, { id: 3, name: 'River Three' }]
     ]))
   })
-
 })
 
 describe('test getRivers function', () => {
